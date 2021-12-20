@@ -44,12 +44,12 @@ public class UIHandler : MonoBehaviour
             RememberName.userName = String.Empty;
         }
         GameObject.Find("BestScoreText").GetComponent<TextMeshProUGUI>().text = "Best Score: " + RememberName.highestName + ": " + RememberName.highestScore;
-        GameObject.Find("TextBox").GetComponent<TextMeshProUGUI>().text = RememberName.userName;
+        GameObject.Find("InputField").GetComponent<InputField>().text = RememberName.userName;
     }
 
     public void StartNew()
     {
-        RememberName.userName = GameObject.Find("TextBox").GetComponent<TextMeshProUGUI>().text;
+        RememberName.userName = GameObject.Find("InputField").GetComponent<InputField>().text;
         if (RememberName.userName != String.Empty)
         {
             SceneManager.LoadScene(1);

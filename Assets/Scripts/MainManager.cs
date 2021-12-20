@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class MainManager : MonoBehaviour
 {
@@ -18,14 +19,25 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
-    // Start is called before the first frame update
+    [System.Serializable]
+    class SaveData
+    {
+        public string name, user;
+        public int score;
+    }
+
     void Start()
     {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
         int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+        ScoreText.text = RememberName.userName + $"'s Score : 0";
+        if(RememberName.highestScore > 0)
+        {
+            GameObject.Find("HighScoreText").GetComponent<Text>().text = "Best Score: " + RememberName.highestName + ": " + RememberName.highestScore;
+        }
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -65,12 +77,31 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = RememberName.userName + $"'s Score : {m_Points}";
+    }
+
+    public void SaveHighestScoreData()
+    {
+        SaveData data = new SaveData();
+        data.name = RememberName.highestName;
+        data.score = RememberName.highestScore;
+        data.user = RememberName.userName;
+    
+        string json = JsonUtility.ToJson(data);
+    
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        if (m_Points > RememberName.highestScore)
+        {
+            RememberName.highestName = RememberName.userName;
+            RememberName.highestScore = m_Points;
+            GameObject.Find("HighScoreText").GetComponent<Text>().text = "Best Score: " + RememberName.highestName + ": " + RememberName.highestScore;
+        }
+        SaveHighestScoreData();
     }
 }
